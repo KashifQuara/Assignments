@@ -7,7 +7,7 @@ const rl = readline.createInterface({
 });
 
 rl.question("Enter a number: ", (num) => {
-  num = parseInt(num); // Convert input to integer
+  num = parseInt(num); 
 
   if (isNaN(num)) {
     console.error("Invalid input: not a number");
@@ -15,9 +15,8 @@ rl.question("Enter a number: ", (num) => {
     return;
   }
 
-  const filename = `table-${num}.txt`; // Create filename based on input
+  const filename = `table-${num}.txt`; 
 
-  // Write multiplication table to file
   let data = "";
   for (let i = 1; i <= 10; i++) {
     data += `${num} x ${i} = ${num * i}\n`;
