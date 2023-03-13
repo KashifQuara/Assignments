@@ -1,48 +1,58 @@
 const readline = require('readline');
 const Sequelize = require('sequelize');
+const Table = require('cli-table');
 
-// create a new sequelize instance with the database credentials
+// New sequelize instance with the database credentials
 const sequelize = new Sequelize('students', 'postgres', 'KK0824', {
   host: 'localhost',
   dialect: 'postgres',
 });
 
-// define the Student model
-const Student = sequelize.define('table_pro2', {
+// defining the Student model
+const Student = sequelize.define('table_pro2s', {
   name: Sequelize.STRING,
   age: Sequelize.INTEGER,
   gender: Sequelize.STRING,
-  updated_at: Sequelize.DATE,
+}, {
+  tableName: 'table_pro2s', 
+  timestamps: true, 
 });
 
-// set up readline interface for user input
+// readline interface for user input
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-// add a new student to the database
+// adding a new student to the database
 function addStudent() {
   rl.question('Enter student id: ', id => {
-  rl.question('Enter student name: ', name => {
-    rl.question('Enter student age: ', age => {
-      rl.question('Enter student gender: ', gender => {
-        Student.create({
-            id,
-          name,
-          age: parseInt(age),
-          gender,
-        }).then(() => {
-          console.log('Student added successfully');
+    rl.question('Enter student name: ', name => {
+      rl.question('Enter student age: ', age => {
+        // validating age input
+        if (isNaN(age) || age < 0) {
+          console.log('Invalid age. Please enter a positive number.');
           rl.close();
+          return;
+        }
+
+        rl.question('Enter student gender: ', gender => {
+          Student.create({
+            id,
+            name,
+            age: parseInt(age),
+            gender,
+          }).then(() => {
+            console.log('Student added successfully');
+            rl.close();
+          });
         });
       });
-    });
     });
   });
 }
 
-// update an existing student in the database
+// updating an existing student in the database
 function updateStudent() {
   rl.question('Enter student id: ', id => {
     rl.question('Enter updated student name: ', name => {
@@ -71,9 +81,13 @@ function updateStudent() {
 function displayStudents() {
   Student.findAll().then(students => {
     console.log('All students:');
-    students.forEach(student => {
-      console.log(`${student.name}, ${student.age}, ${student.gender}`);
+    const table = new Table({
+      head: ['ID', 'Name', 'Age', 'Gender', 'Created At', 'Updated At'],
     });
+    students.forEach(student => {
+      table.push([student.id, student.name, student.age, student.gender, student.createdAt, student.updatedAt]);
+    });
+    console.log(table.toString());
     rl.close();
   });
 }
